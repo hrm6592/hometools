@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # PerlTidy Setting
-# D:\Perl64\perl\bin\perltidy -b -q -bt=1 -pt=1 -lp -aws -dws -kbl=0 -dnl -l=75 $(FileNameEx)
+# D:\Perl64\site\bin\perltidy -b -q -bt=1 -pt=1 -lp -aws -dws -kbl=0 -dnl -l=75 $(FileNameEx)
 # -------------------------------------------------------------------
 # use 5.012;    # so readdir assigns to $_ in a lone while test
 use File::Copy;
@@ -22,7 +22,7 @@ our $home       = $opts{'h'} ||= '/var/spool/torrent';
 our $mi         = '/usr/local/bin/mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.9';
+our $version    = '0.6.11';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
@@ -253,17 +253,21 @@ DIR: foreach my $d (@Directories) {
             $ext   = 'mp4';
         }
         elsif (
-            $f =~ /^chd1080\.com\@nomask60fps_
-                   ([a-z]+?)
+            $f =~ /^(?:chd1080|hhd800)\.com\@
+                   (?:nomask60fps_|\d{3})?
+                   ([a-zA-Z]+?)
+                   \-?
                    (\d{3,5})
-                   (?:hhb_1080P)?
+                   (?:hhb_1080P|_uncensored)?
                   \.mp4/x
           )
         {
             # chd1080.com@nomask60fps_hnd00292hhb_1080P.mp4
+            # hhd800.com@BF-631.mp4
+            # hhd800.com@420POW-001.mp4
             #
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
-            $fname = uc($1) . '-' . sprintf( "%3d", "$2" );
+            $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
             $ext   = 'mp4';
         }
         else {
@@ -279,7 +283,8 @@ DIR: foreach my $d (@Directories) {
 
         # Move file -------------------------------------------------
         if ( -e "$home/$fname" ) {
-            my $log = bold("WARN: ")
+            my $log =
+              bold("WARN: ")
               . "$fname is already exist in $home. Ignored\n";
             $log = fg( 'yellow1', $log );
             print STDERR $log;
@@ -309,7 +314,7 @@ DIR: foreach my $d (@Directories) {
     }
     else {
         no strict 'refs';
-        remove_tree( $d, {'error' => \my $refErr} );
+        remove_tree( $d, { 'error' => \my $refErr } );
         if ( ( defined $refErr ) and ( scalar @{$refErr} ) ) {
             for my $diag ( @{$refErr} ) {
                 my ( $file, $message ) = %{$diag};
