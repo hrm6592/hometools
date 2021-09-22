@@ -27,7 +27,7 @@ do
     # remove unwanted index number from file name.
     # 259LUXU-1117.mp4
     # 326NKR-008.mp4
-    if [[ $bn =~ ^([0-9]{3})(.*)$ ]]; then
+    if [[ $bn =~ ^([0-9]{3})([A-Z].*)$ ]]; then
         idx=${BASH_REMATCH[1]}
         if [ $idx == "420" ]; then
             # Exclude "420POW" series.
@@ -40,6 +40,11 @@ do
     # remove unwanted prefix string
     if [[ $bn =~ _TEST[0-9]$ ]]; then
         # My encording test files.
+        continue
+    elif [[ $bn =~ (10mu|1pon|carib|paco)$ ]]; then
+        # Uncencored movies
+        # 012321-001.carib.mp4
+        # 051420_01.10mu.mp4
         continue
     elif [[ $bn =~ ^hhd000.*内容_(.*)$ ]]; then
         # hhd000.com_免翻#墙免费访问全球最大情#色网站P#ornhub,可看收费内容_FSDSS-027.1080p.mp4
