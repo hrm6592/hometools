@@ -19,10 +19,10 @@ getopts( 'th:l:', \%opts );
 # -------------------------------------------------------------------
 # Static variables.
 our $home       = $opts{'h'} ||= '/var/spool/torrent';
-our $mi         = '/usr/local/bin/mediainfo';
+our $mi         = '/usr/bin/env mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.11';
+our $version    = '0.6.12';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
@@ -258,6 +258,7 @@ DIR: foreach my $d (@Directories) {
                    ([a-zA-Z]+?)
                    \-?
                    (\d{3,5})
+                   [A-Z]?
                    (?:hhb_1080P|_uncensored)?
                   \.mp4/x
           )
@@ -265,6 +266,7 @@ DIR: foreach my $d (@Directories) {
             # chd1080.com@nomask60fps_hnd00292hhb_1080P.mp4
             # hhd800.com@BF-631.mp4
             # hhd800.com@420POW-001.mp4
+            # hhd800.com@KTRA-289E.mp4
             #
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
             $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
