@@ -6,7 +6,7 @@ optFormat='--Output=General;%Format%'
 optHeight='--Output=Video;%Height%'
 pattern=".*[\.\-](1080p|720p)\..*"
 
-cd /var/spool/torrent || exit 2
+cd /srv/storage/download || cd /mnt/torrent/download || exit 2
 
 for f in [0-9A-Za-z]*.{mp4,mkv,wmv}
 do
@@ -79,7 +79,7 @@ do
     if [ "$ext" == "MP4" ]; then
 
         # rename to properly exts.
-        if [ "$type" == "MP4" ]; then
+        if [ "$type" == "MPEG-4" ]; then
             # add size identifier
             if [ "$f" != "${bn}.mp4" ]; then
                 mv "$f" "${bn}.mp4"
