@@ -1,23 +1,25 @@
 #!/bin/bash
 # Convert file extension to correct video type.
 #
-mi=/usr/local/bin/mediainfo
+mi=$(which mediainfo)
 optFormat='--Output=General;%Format%'
-optWidth='--Output=Video;%Width%'
-pattern=".*[\.\-]1080p\..*"
+optHeight='--Output=Video;%Height%'
+pattern=".*[\.\-](1080p|720p)\..*"
 
 cd /var/spool/torrent || exit 2
 
 for f in [0-9A-Za-z]*.{mp4,mkv,wmv}
 do
     if [[ $f =~ $pattern ]]; then
+        # These files were already checked.
         continue
     elif [ -e "$f" ]; then
         ext=$(echo "${f##*.}" | tr '[:lower:]' '[:upper:]')
         type=$($mi $optFormat "$f")
-        width=$($mi $optWidth "$f")
+        height=$($mi $optHeight "$f")
         chmod 644 "$f"
     else
+        # Directories or what ?
         continue
     fi
 
@@ -29,7 +31,7 @@ do
     # 326NKR-008.mp4
     if [[ $bn =~ ^([0-9]{3})([A-Z].*)$ ]]; then
         idx=${BASH_REMATCH[1]}
-        if [ $idx == "420" ]; then
+        if [ "$idx" == "420" ]; then
             # Exclude "420POW" series.
             bn=${BASH_REMATCH[0]}
         else
@@ -63,20 +65,23 @@ do
         bn=${BASH_REMATCH[1]}
     fi
 
-    # check width of video and add basename to "1080p"
+    # check height of video and add basename to "1080p"
     # if needed.
-    if [ "$width" == "1920" ]; then
+    if [ "$height" == "1080" ]; then
         bn="${bn}.1080p"
-        echo "$f has 1920px width."
+        echo "$f has 1080px height."
+    elif [ "$height" == "720" ]; then
+        bn="${bn}.720p"
+        echo "$f has 720px height."
     fi
 
     # Check video format.
     if [ "$ext" == "MP4" ]; then
 
         # rename to properly exts.
-        if [ "$type" == "MPEG-4" ]; then
+        if [ "$type" == "MP4" ]; then
             # add size identifier
-            if [ "$f" != "$bn.mp4" ]; then
+            if [ "$f" != "${bn}.mp4" ]; then
                 mv "$f" "${bn}.mp4"
             fi
         elif [ "$type" == "AVI" ]; then
