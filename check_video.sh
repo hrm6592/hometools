@@ -6,10 +6,14 @@ optFormat='--Output=General;%Format%'
 optHeight='--Output=Video;%Height%'
 pattern=".*[\.\-](1080p|720p)\..*"
 
-if [ -e /srv/storage/download ]; then
+if [ -d /srv/storage/download ]; then
     cd /srv/storage/download || exit 2
-elif [ -e /mnt/torrent/download ]; then
+elif [ -d /mnt/torrent/download ]; then
     cd /mnt/torrent/download || exit 2
+else
+    host=$(uname -n)
+    echo "There is no download folder for $host"
+    exit 3
 fi
 
 for f in [0-9A-Za-z]*.{mp4,mkv,wmv}
