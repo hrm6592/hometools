@@ -6,7 +6,11 @@ optFormat='--Output=General;%Format%'
 optHeight='--Output=Video;%Height%'
 pattern=".*[\.\-](1080p|720p)\..*"
 
-cd /srv/storage/download || cd /mnt/torrent/download || exit 2
+if [ -e /srv/storage/download ]; then
+    cd /srv/storage/download || exit 2
+elif [ -e /mnt/torrent/download ]; then
+    cd /mnt/torrent/download || exit 2
+fi
 
 for f in [0-9A-Za-z]*.{mp4,mkv,wmv}
 do
