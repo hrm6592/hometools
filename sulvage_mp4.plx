@@ -82,7 +82,7 @@ DIR: foreach my $d (@Directories) {
         if (
             $f =~ /^\[(?:Thz\.la|ThZu\.Cc|.+\.me)\]
                    \d*?
-                   ([A-Za-z]+|t28)
+                   ([A-Za-z]+|t28|\d{2}ID)
                    \-?
                    (\d+)
                    (cd\d|CD\d)?
@@ -255,7 +255,7 @@ DIR: foreach my $d (@Directories) {
         elsif (
             $f =~ /^(?:chd1080|hhd800)\.com\@
                    (?:nomask60fps_|\d{3})?
-                   ([a-zA-Z]+?)
+                   ([a-zA-Z]+?|\d{2}ID)
                    \-?
                    (\d{3,5})
                    [A-Z]?
@@ -267,6 +267,7 @@ DIR: foreach my $d (@Directories) {
             # hhd800.com@BF-631.mp4
             # hhd800.com@420POW-001.mp4
             # hhd800.com@KTRA-289E.mp4
+            # 29ID-024/hhd800.com@29ID-024.mp4
             #
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
             $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
