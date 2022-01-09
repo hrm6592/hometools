@@ -71,6 +71,10 @@ do
         # PPPD-842_hhd000.com_免翻_墙免费访问全球最大情_色网站P_ornhub_可看收费内容.mp4
         # HND-808@hhd000.com_免翻#墙免费访问全球最大情#色网站P#ornhub,可看收费内容.1080p.mp4
         bn=${BASH_REMATCH[1]}
+    elif [[ $bn =~ ^(hhd800|hdd600)\.com@([0-9A-Z\-]+)_UNCENSORED_.* ]]; then
+        # hhd800.com@ABP-948_UNCENSORED_LEAKED.mp4
+        # hdd600.com@ABP-948_UNCENSORED_LEAKED_NOWATERMARK.mp4
+        bn=${BASH_REMATCH[2]}
     fi
 
     # check height of video and add basename to "1080p"
