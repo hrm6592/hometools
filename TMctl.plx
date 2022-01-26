@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # -b -q -bt=1 -pt=1 -lp -aws -dws -kbl=0 -dnl -l=75
-# -------------------------------------------------------------------
+# ------------------------------------------------------------------------
 use Data::Dumper;
 use Getopt::Std;
 use JSON::XS;
@@ -26,7 +26,7 @@ our $ua   = LWP::UserAgent->new( agent => 'Transmission-Client' );
 our $uri = 'http://192.168.1.102:9091/transmission/rpc';
 $Data::Dumper::Indent = 2;
 our $minSeeders     = $opts{'m'} ||= 5;
-our $dateLimit      = ( $opts{'d'} ||= 150 ) * 86400;            # seconds.
+our $dateLimit      = ( $opts{'d'} ||= 150 ) * 86400; # seconds.
 our $seedRatioLimit = $opts{'r'} ||= undef;
 our $dataLimitMode  = $opts{'a'} ? 'addedDate' : 'dateCreated';
 
