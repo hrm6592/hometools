@@ -309,11 +309,10 @@ def main():
         return ret
 
     def rescan_home(dir: Path) -> None:
-        for e in db.get_all_entry()[0]:
-            # print("e: {}".format(e))
-            if dir.joinpath(e).resolve().is_file() is False:
+        for e in db.get_all_entry():
+            if dir.joinpath(e[0]).resolve().is_file() is False:
                 # Try find similar file.
-                for t in db.search_entry(Path(e).stem):
+                for t in db.search_entry(Path(e[0]).stem):
                     if dir.joinpath(t.name).resolve().is_file() is False:
                         db.del_entry(t.name)
 
