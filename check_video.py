@@ -3,6 +3,7 @@
 import argparse
 import re
 import sqlite3
+import syslog
 from datetime import timedelta
 from os import chdir
 from pathlib import Path
@@ -93,7 +94,10 @@ class _db:
     def init_db(self, dbname: str):
         # Make file if not exist.
         if not Path.is_file(Path(dbname)):
-            print("DB is not exist. So we make it to {}".format(dbname))
+            syslog.syslog(
+                syslog.LOG_WARNING,
+                "DB is not exist. So we make it to {}".format(dbname),
+            )
 
             # Initialize table for store datas.
             con = sqlite3.connect(self.dbname)
@@ -165,12 +169,12 @@ class _db:
         con = sqlite3.connect(self.dbname)
         try:
             with con:
-                print("Deleting {} from DB...".format(name))
+                syslog.syslog(syslog.LOG_NOTICE, "Deleting {} from DB...".format(name))
                 return con.execute(
                     "DELETE FROM movie WHERE name='{}';".format(name)
                 ).rowcount
         except sqlite3.IntegrityError:
-            print("Entry {} cannot delete".format(name))
+            syslog.syslog(syslog.LOG_ERR, "Entry {} cannot delete".format(name))
             return -1
 
     def get_all_entry(self) -> list[str]:
@@ -184,6 +188,8 @@ class _db:
 
 
 def main():
+    syslog.openlog(logoption=syslog.LOG_NDELAY, facility=syslog.LOG_LOCAL2)
+
     def get_height_suffix(mi: _movie_info) -> str:
         """Get height information to add suffix to filename.
 
@@ -367,6 +373,7 @@ def main():
     args = parser.parse_args()
 
     # Set HOME directory to work with.
+    syslog.syslog(syslog.LOG_INFO, "Check files in {}".format(args.home))
     if not Path(args.home).is_dir:
         raise NotADirectoryError
     home_entries = Path(args.home)
@@ -380,9 +387,10 @@ def main():
 
     # Delete specified entry from DB
     if args.delete is not None:
+        syslog.syslog(syslog.LOG_INFO, "Delete MODE")
         # print("Delete Target: {}".format(args.delete))
         for d in args.delete:
-            print("Deleted entries: {}".format(db.del_entry(d)))
+            db.del_entry(d)
         return 3
 
     # Rescan mode.
