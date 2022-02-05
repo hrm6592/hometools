@@ -176,6 +176,8 @@ class _db:
         except sqlite3.IntegrityError:
             syslog.syslog(syslog.LOG_ERR, "Entry {} cannot delete".format(name))
             return -1
+        finally:
+            con.close
 
     def get_all_entry(self) -> list[str]:
         con = sqlite3.connect(self.dbname)
@@ -395,6 +397,7 @@ def main():
 
     # Rescan mode.
     if args.rescan is True:
+        syslog.syslog(syslog.LOG_INFO, "Rescan MODE")
         rescan_home(home_entries.resolve())
         return 4
 
