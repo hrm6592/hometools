@@ -179,6 +179,17 @@ class _db:
         finally:
             con.close
 
+    def vacuum_table(self) -> None:
+        con = sqlite3.connect(self.dbname)
+        try:
+            with con:
+                syslog.syslog(syslog.LOG_NOTICE, "Execute vacuum command on DB...")
+                con.execute("VACUUM;")
+        except sqlite3.IntegrityError:
+            syslog.syslog(syslog.LOG_ERR, "Cannot vacuum DB!")
+        finally:
+            con.close
+
     def get_all_entry(self) -> list[str]:
         con = sqlite3.connect(self.dbname)
         ret: list[str] = []
@@ -399,6 +410,7 @@ def main():
     if args.rescan is True:
         syslog.syslog(syslog.LOG_INFO, "Rescan MODE")
         rescan_home(home_entries.resolve())
+        db.vacuum_table()
         return 4
 
     # Check file entries.
