@@ -444,6 +444,7 @@ def main():
             if len(sr) == 0:
                 db.add_entry(file)
 
+    syslog.closelog()
     return 0
 
 
