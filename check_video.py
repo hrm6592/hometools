@@ -415,9 +415,10 @@ def main():
 
     # Check file entries.
     for e in home_entries.iterdir():
+        target = re.compile(r".(?:avi|mp4|wmv|mkv)$")
         if e.is_dir():
             pass
-        if e.is_file() and re.search(r".(avi|mp4)$", e.name):
+        if e.is_file() and target.search(e.name):
             file = _movie_info()
             file.analyze(e.name)
             fname = regularization(e, file)
@@ -425,7 +426,7 @@ def main():
             # print("Regularized file name: {}".format(fname))
 
             # NOTE: Following code try to rename file to regularized name.
-            #       BE CAREFUL or lost your file!!
+            #       BE CAREFUL or lose your file and yourself ⚠
             sr: list[_movie_info] = db.search_entry(fname)
             if (
                 len(sr) == 0
