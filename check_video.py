@@ -414,11 +414,14 @@ def main():
         return 4
 
     # Check file entries.
+    target_suffix = re.compile(r".(?:avi|mp4|wmv|mkv)$")
+    regularized_suffix = re.compile(
+        r"^\.(?:720p\.|1080p\.)?(?:mp4|avi|wmv|ts|m2ts|mkv)$"
+    )
     for e in home_entries.iterdir():
-        target = re.compile(r".(?:avi|mp4|wmv|mkv)$")
         if e.is_dir():
             pass
-        if e.is_file() and target.search(e.name):
+        if e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
             file.analyze(e.name)
             fname = regularization(e, file)
@@ -432,7 +435,7 @@ def main():
                 len(sr) == 0
                 and fname != e.name
                 and Path(fname).is_file() is False
-                and not re.match(r"^\.(720p\.|1080p\.)?(avi|mp4)$", fname)
+                and not regularized_suffix.match(fname)
             ):
                 # print("'{}' ➡ '{}'".format(e.name, fname))
                 e.chmod(0o644)
