@@ -38,7 +38,7 @@ class _movie_info:
         self.codec = ""
         self.fps = 29.970
 
-    def analyze(self, movie: str) -> Self:
+    def analyze(self, movie: str) -> Self | None:
         """Get information about specified movie.
 
         Args:
@@ -68,8 +68,11 @@ class _movie_info:
                 self.fps,
             ] = out.split("/")
         except ValueError:
-            print("{} failed for {}\n{}".format(self.__cmd, movie, out))
-            return self
+            syslog.syslog(
+                syslog.LOG_WARNING, "{} failed for {}".format(self.__cmd, movie)
+            )
+            syslog.syslog(syslog.LOG_INFO, out)
+            return None
 
         self.duration = timedelta(
             seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
@@ -423,7 +426,11 @@ def main():
             pass
         if e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
-            file.analyze(e.name)
+            if file.analyze(e.name) is None:
+                syslog.syslog(
+                    syslog.LOG_WARNING, "File analyse failed({})".format(e.name)
+                )
+                continue
             fname = regularization(e, file)
             file.name = Path(fname).name
             # print("Regularized file name: {}".format(fname))
@@ -444,6 +451,7 @@ def main():
             if len(sr) == 0:
                 db.add_entry(file)
 
+    syslog.syslog(syslog.LOG_INFO, "Movie check done. exit.")
     syslog.closelog()
     return 0
 
