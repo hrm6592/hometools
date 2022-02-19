@@ -423,8 +423,13 @@ def main():
     )
     for e in home_entries.iterdir():
         if e.is_dir():
-            pass
-        if e.is_file() and target_suffix.search(e.name):
+            continue
+
+        listed_file_search_result: list[_movie_info] = db.search_entry(e.name)
+        if len(listed_file_search_result) == 0:
+            # print("{} does not exist in DB.".format(e.name))
+            continue
+        elif e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
             if file.analyze(e.name) is None:
                 syslog.syslog(
