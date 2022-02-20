@@ -38,6 +38,9 @@ class _movie_info:
         self.codec = ""
         self.fps = 29.970
 
+    def __str__(self) -> str:
+        return self.name
+
     def analyze(self, movie: str) -> Self | None:
         """Get information about specified movie.
 
@@ -360,6 +363,13 @@ def main():
         default="/var/lib/misc/",
         help="Directory for put DB. Need wrightable permission.",
     )
+    arg_group1.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        default=False,
+        help="Force re-analyse all files in torrent directory",
+    )
     arg_group2 = parser.add_argument_group(
         "actions", "Specify other action instead of scan and rename target directry"
     )
@@ -426,8 +436,14 @@ def main():
             continue
 
         listed_file_search_result: list[_movie_info] = db.search_entry(e.name)
-        if len(listed_file_search_result) == 0:
-            # print("{} does not exist in DB.".format(e.name))
+        if len(listed_file_search_result) > 0 and args.force is False:
+            # print(
+            #     "{}({}): {}".format(
+            #         e.name,
+            #         len(listed_file_search_result),
+            #         str(listed_file_search_result[0]),
+            #     )
+            # )
             continue
         elif e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
