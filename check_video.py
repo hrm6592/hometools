@@ -4,6 +4,7 @@ import argparse
 import re
 import sqlite3
 import syslog
+from dataclasses import dataclass
 from datetime import timedelta
 from os import chdir
 from pathlib import Path
@@ -13,6 +14,7 @@ from types import NotImplementedType
 from typing_extensions import Self
 
 
+@dataclass
 class _movie_info:
     """Store class for analized movie file."""
 
