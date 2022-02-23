@@ -26,13 +26,13 @@ our $ua   = LWP::UserAgent->new( agent => 'Transmission-Client' );
 our $uri = 'http://192.168.1.102:9091/transmission/rpc';
 $Data::Dumper::Indent = 2;
 our $minSeeders     = $opts{'m'} ||= 5;
-our $dateLimit      = ( $opts{'d'} ||= 150 ) * 86400; # seconds.
+our $dateLimit      = ( $opts{'d'} ||= 150 ) * 86400;    # seconds.
 our $seedRatioLimit = $opts{'r'} ||= undef;
 our $dataLimitMode  = $opts{'a'} ? 'addedDate' : 'dateCreated';
 
 # ------------------------------------------------------------------------
 # Remove mode if needed.
-print bold("Transmission API controler.\n");
+print bold("Transmission API controller.\n");
 if ($seedRatioLimit) {
     die("Specify seeding limit ratio in number!\n")
       unless ( $seedRatioLimit =~ /^[0-9\.]+$/ );
@@ -44,8 +44,7 @@ if ($seedRatioLimit) {
         print Data::Dumper->Dump( [$refFinishedList], [qw(CompletedIds)] );
         exit 0;
     }
-    print fg( 'red2',
-              [ "\n", 'Remove seeding completed torrents.', "\n" ] );
+    print fg( 'red2', [ "\n", 'Remove seeding completed torrents.', "\n" ] );
     removeTorrent($refFinishedList);
     exit 0;
 }
@@ -68,14 +67,13 @@ getList();
 #                           [qw (JSONtorrentList)] );
 our @needDownload;
 our %TrNameList;
-foreach my $t ( @{ $json->decode($jTrList)->{"arguments"}->{"torrents"} } )
-{
+foreach my $t ( @{ $json->decode($jTrList)->{"arguments"}->{"torrents"} } ) {
     my $sCount = 0;
     foreach my $s ( @{ $t->{'trackerStats'} } ) {
         $sCount += ( $s->{'seederCount'} < 0 ) ? 0 : $s->{'seederCount'};
     }
-    if (    ( $sCount < $minSeeders )
-         or ( time - $t->{$dataLimitMode} > $dateLimit ) )
+    if (   ( $sCount < $minSeeders )
+        or ( time - $t->{$dataLimitMode} > $dateLimit ) )
     {
         push @needDownload, $t->{"id"};
         $TrNameList{ $t->{"name"} } = $sCount;
@@ -85,21 +83,20 @@ foreach my $t ( @{ $json->decode($jTrList)->{"arguments"}->{"torrents"} } )
 # ------------------------------------------------------------------------
 # Start download listed torrents.
 our $reqTrStart = {
-                    'method'    => 'torrent-start',
-                    'arguments' => { 'ids' => \@needDownload },
+    'method'    => 'torrent-start',
+    'arguments' => { 'ids' => \@needDownload },
 };
 if ( $opts{'l'} ) {
     print Data::Dumper->Dump( [ \%TrNameList ], [qw(TorrentName)] );
     exit 0;
 }
 our $res = $ua->post( $uri, 'Content' => $json->encode($reqTrStart) );
-print Data::Dumper->Dump( [ $json->decode( $res->content ) ],
-                          [qw(Result)] );
+print Data::Dumper->Dump( [ $json->decode( $res->content ) ], [qw(Result)] );
 
 # ------------------------------------------------------------------------
 # Subs
 sub getList (;$) {
-    my $nested = shift;
+    my $nested    = shift;
     my $reqTrList = {
         'method'    => 'torrent-get',
         'arguments' => {
@@ -125,11 +122,11 @@ sub getList (;$) {
         }
     }
     else {
-       # request succeeded.
-       # print Dumper( $res->headers );
-       # print "Response Data structure is ", ref $res->content, "\n";
-       # print $json->decode( $res->content ), "\n";
-       # print Data::Dumper->Dump( [ $res->content ], [qw(ResponseData)] );
+        # request succeeded.
+        # print Dumper( $res->headers );
+        # print "Response Data structure is ", ref $res->content, "\n";
+        # print $json->decode( $res->content ), "\n";
+        # print Data::Dumper->Dump( [ $res->content ], [qw(ResponseData)] );
         $jTrList = $res->content;
         return 1;
     }
@@ -141,11 +138,11 @@ sub getFinishiedList ($;$) {
     my $nested    = shift;
     my @completed = ();
     my $reqTrList = {
-             'method'    => 'torrent-get',
-             'arguments' => {
-                 'fields' => [ 'id', 'name', 'uploadRatio', 'isFinished' ],
-             },
-             tag => int rand 2 * 32 - 1,
+        'method'    => 'torrent-get',
+        'arguments' => {
+            'fields' => [ 'id', 'name', 'uploadRatio', 'isFinished' ],
+        },
+        tag => int rand 2 * 32 - 1,
     };
     $ua->default_header( 'X-Transmission-Session-Id' => $sid );
 
@@ -166,10 +163,7 @@ sub getFinishiedList ($;$) {
     else {
         # request succeeded.
         foreach my $t (
-            @{
-                $json->decode( $res->content )->{"arguments"}->{"torrents"}
-            }
-          )
+            @{ $json->decode( $res->content )->{"arguments"}->{"torrents"} } )
         {
             next if ( ${ $t->{'isFinished'} } != 1 );
             next if ( $t->{'uploadRatio'} < $limit );
@@ -180,16 +174,16 @@ sub getFinishiedList ($;$) {
 }
 
 sub removeTorrent ($) {
-    my $refList = shift;
+    my $refList     = shift;
     my $reqTrRemove = {
-                        'method'    => 'torrent-remove',
-                        'arguments' => { 'ids' => $refList },
+        'method'    => 'torrent-remove',
+        'arguments' => { 'ids' => $refList },
     };
 
     # print Data::Dumper->Dump( [$reqTrRemove], [qw(RemoveList)] );
     my $res = $ua->post( $uri, 'Content' => $json->encode($reqTrRemove) );
     print Data::Dumper->Dump( [ $json->decode( $res->content ) ],
-                              [qw(Result)] );
+        [qw(Result)] );
     return 0;
 }
 
