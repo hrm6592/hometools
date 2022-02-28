@@ -53,14 +53,11 @@ class _movie_info:
             [_movie_info]: Movie information.
         """
         # print("Target: {}".format(movie))
-        # print("Get movie information using {}".format(self.__cmd))
         opt = "--Output=General;%FileName%/%Duration%/%Format%/\r\nVideo;%Height%/%Format%/%FrameRate%"
         proc = Popen(
             [self.__cmd, opt, movie], stdin=None, stdout=PIPE, stderr=PIPE, text=True
         )
         out, _ = proc.communicate()
-        # print("OutPut: {}".format(out))
-        # print("Error: {}".format(err))
 
         # Split output into proper variables.
         try:
@@ -79,10 +76,18 @@ class _movie_info:
             syslog.syslog(syslog.LOG_INFO, out)
             return None
 
-        self.duration = timedelta(
-            seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
-        ) / timedelta(hours=1)
-        self.duration = "{:.3f}".format(self.duration)
+        try:
+            self.duration = timedelta(
+                seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
+            ) / timedelta(hours=1)
+            self.duration = "{:.3f}".format(self.duration)
+        except ValueError:
+            syslog.syslog(
+                syslog.LOG_WARNING,
+                "{} returned invalid duration for {}".format(self.__cmd, movie),
+            )
+            syslog.syslog(syslog.LOG_INFO, out)
+            return None
 
         return self
 
@@ -130,13 +135,9 @@ class _db:
         con = sqlite3.connect(self.dbname)
         con.row_factory = sqlite3.Row
         ret: list[_movie_info] = []
-        # print("ret type: {}".format(type(ret)))
         cur = con.cursor()
-        # print("Search target: {}".format(filename))
         cur.execute("SELECT * FROM movie WHERE name LIKE ?;", (filename + "%",))
-        # print(cur.fetchall())
         for row in cur.fetchall():
-            # print("Row: {}".format(row["name"]))
             r = _movie_info()
             r.name = row["name"]
             r.duration = row["duration"]
@@ -203,7 +204,6 @@ class _db:
         ret: list[str] = []
         with con:
             ret = con.execute("SELECT name from movie;").fetchall()
-            # print("return type: {}".format(type(ret)))
         con.close
         return ret
 
@@ -439,13 +439,6 @@ def main():
 
         listed_file_search_result: list[_movie_info] = db.search_entry(e.name)
         if len(listed_file_search_result) > 0 and args.force is False:
-            # print(
-            #     "{}({}): {}".format(
-            #         e.name,
-            #         len(listed_file_search_result),
-            #         str(listed_file_search_result[0]),
-            #     )
-            # )
             continue
         elif e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
@@ -456,7 +449,6 @@ def main():
                 continue
             fname = regularization(e, file)
             file.name = Path(fname).name
-            # print("Regularized file name: {}".format(fname))
 
             # NOTE: Following code try to rename file to regularized name.
             #       BE CAREFUL or lose your file and yourself ⚠
@@ -467,7 +459,6 @@ def main():
                 and Path(fname).is_file() is False
                 and not regularized_suffix.match(fname)
             ):
-                # print("'{}' ➡ '{}'".format(e.name, fname))
                 e.chmod(0o644)
                 e.rename(Path(fname))
 
