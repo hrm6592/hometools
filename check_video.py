@@ -76,6 +76,9 @@ class _movie_info:
             syslog.syslog(syslog.LOG_INFO, out)
             return None
 
+        # Round down after the decimal point
+        self.duration = self.duration.split(".")[0]
+
         try:
             self.duration = timedelta(
                 seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
@@ -289,7 +292,7 @@ def main():
             # MIDE-765_hhd000.com_免翻_墙免费访问全球最大情_色网站P_ornhub_可看收费内容.mp4
             # SNIS-383_uncensored.mp4
             r"^(?P<index>[0-9A-Z\-]+)[_@].*?$": ["index"],
-            # # hhd800.com@ABP-948_UNCENSORED_LEAKED.mp4
+            # hhd800.com@ABP-948_UNCENSORED_LEAKED.mp4
             r"""^(?:hhd800|hdd600)\.com@
                 (?P<index>[0-9A-Z\-]+)
                 _UNCENSORED_.*?$
@@ -438,6 +441,7 @@ def main():
             continue
 
         listed_file_search_result: list[_movie_info] = db.search_entry(e.name)
+        # print(e.name, ":", listed_file_search_result)
         if len(listed_file_search_result) > 0 and args.force is False:
             continue
         elif e.is_file() and target_suffix.search(e.name):
