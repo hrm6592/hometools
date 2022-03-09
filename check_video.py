@@ -357,7 +357,7 @@ def main():
         action="store",
         required=True,
         type=Path,
-        default="/mnt/torrent/download/",
+        default="/mnt/torrent/",
         help="Directory for movie file stored.",
     )
     arg_group1.add_argument(
