@@ -355,7 +355,6 @@ def main():
     arg_group1.add_argument(
         "--home",
         action="store",
-        required=True,
         type=Path,
         default="/mnt/torrent/",
         help="Directory for movie file stored.",
@@ -363,7 +362,6 @@ def main():
     arg_group1.add_argument(
         "--dbhome",
         action="store",
-        required=True,
         type=Path,
         default="/var/lib/misc/",
         help="Directory for put DB. Need wrightable permission.",
