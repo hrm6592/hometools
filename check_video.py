@@ -293,7 +293,8 @@ def main():
             # SNIS-383_uncensored.mp4
             r"^(?P<index>[0-9A-Z\-]+)[_@].*?$": ["index"],
             # hhd800.com@ABP-948_UNCENSORED_LEAKED.mp4
-            r"""^(?:hhd800|hdd600)\.com@
+            # HDD600.COM@STARS-199_UNCENSORED_LEAKED_NOWATERMARK.mp4
+            r"""^(?:hhd800|hdd600|HDD600)\.(?:com|COM)@
                 (?P<index>[0-9A-Z\-]+)
                 _UNCENSORED_.*?$
             """: [
@@ -303,7 +304,7 @@ def main():
 
         # File name regularization
         for r, idx in re_list.items():
-            m = re.search(r, basename)
+            m = re.search(r, basename, re.X)
             if m is not None and idx[0] == "index":
                 # TODO: Only "index" key is allowed.
                 #       more flexible pattern should be allowed
@@ -311,7 +312,6 @@ def main():
                 # print("Groups: {}".format(m.groups()))
                 # print("GroupDict: {}".format(m.groupdict().items()))
                 # print("Index: {}".format(m.groupdict().get("index")))
-                # ret: str = format(str.join("", iter(m.groupdict().values())))
                 ret: str = format(m.groupdict().get("index"))
                 break
             elif m is not None and idx[0] is None:
