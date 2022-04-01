@@ -260,7 +260,7 @@ DIR: foreach my $d (@Directories) {
                    (\d{3,5})
                    [A-Z]?
                    (?:hhb_1080P|_uncensored)?
-                  \.(mp4|mkv)/x
+                   \.(mp4|mkv)/x
           )
         {
             # chd1080.com@nomask60fps_hnd00292hhb_1080P.mp4
