@@ -260,7 +260,7 @@ DIR: foreach my $d (@Directories) {
                    (\d{3,5})
                    [A-Z]?
                    (?:hhb_1080P|_uncensored)?
-                  \.mp4/x
+                  \.(mp4|mkv)/x
           )
         {
             # chd1080.com@nomask60fps_hnd00292hhb_1080P.mp4
@@ -271,7 +271,7 @@ DIR: foreach my $d (@Directories) {
             #
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
             $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
-            $ext   = 'mp4';
+            $ext   = $3;
         }
         else {
             # Invalid useless videos.
