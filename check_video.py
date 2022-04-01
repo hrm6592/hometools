@@ -283,19 +283,23 @@ def main():
             # 420SWEET-041.mp4
             r"^(?P<headnum>[0-9]{3})(?P<index>[A-Z]+?-[0-9]+?)$": ["index"],
             # hhd000.com_免...内容_FSDSS-027.mp4
-            r"^hhd000.*内容_(?P<index>.*?)$": ["index"],
-            # hhd800.com_原版首发_JUL-190.mp4
-            r"^(?:xxfhd|hhd800)\.com_.*?_(?P<index>.*?)$": ["index"],
+            r"^hhd000.*内容_(?P<index>[A-Z]+?-[0-9]+?)$": ["index"],
             # xxfhd.com_IPX-416.mp4
             # xxfhd.com_原版首发_JUNY-018.mp4
-            r"^(?:xxfhd\.com|独家首发)_(?:原版首发_)(?P<index>.*?)$": ["index"],
+            # hhd800.com_原版首发_JUL-190.mp4
+            r"""^(?:xxfhd|hhd800)\.com
+                _(?:原版首发_)?
+                (?P<index>[A-Z]+?-[0-9]+?)$
+            """: [
+                "index"
+            ],
             # MIDE-765_hhd000.com_免翻_墙免费访问全球最大情_色网站P_ornhub_可看收费内容.mp4
             # SNIS-383_uncensored.mp4
-            r"^(?P<index>[0-9A-Z\-]+)[_@].*?$": ["index"],
+            r"^(?P<index>[A-Z]+?-[0-9]+?)[_@].*?$": ["index"],
             # hhd800.com@ABP-948_UNCENSORED_LEAKED.mp4
             # HDD600.COM@STARS-199_UNCENSORED_LEAKED_NOWATERMARK.mp4
             r"""^(?:hhd800|hdd600|HDD600)\.(?:com|COM)@
-                (?P<index>[0-9A-Z\-]+)
+                (?P<index>[A-Z]+?-[0-9]+?)
                 _UNCENSORED_.*?$
             """: [
                 "index"
