@@ -71,11 +71,12 @@ class RedirectorParser(HTMLParser):
             return
         elif (
             tag == "a"
-            and self.flag_found_torrent == True
+            and self.flag_found_torrent is True
             and d.get("href", "") is not None
         ):
             headers = {
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept": "text/html,application/xhtml+xml,application/xml;"
+                + "q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Encoding": "gzip, deflate",
                 "Accept-Language": "ja,en;q=0.5",
                 "Connection": "keep-alive",
@@ -83,7 +84,8 @@ class RedirectorParser(HTMLParser):
                 "Host": "r.jtl.re",
                 "Referer": "http://javtorrent.re/",
                 "Upgrade-Insecure-Requests": "1",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64;"
+                + " rv:97.0) Gecko/20100101 Firefox/97.0",
             }
             href = d.get("href", "")
             if href is not None:
@@ -114,11 +116,12 @@ class DLLinkParser(HTMLParser):
             return
         elif (
             tag == "a"
-            and self.flag_found_torrent == True
+            and self.flag_found_torrent is True
             and d.get("href", "") is not None
         ):
             headers = {
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept": "text/html,application/xhtml+xml,application/xml;"
+                + "q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Encoding": "gzip, deflate",
                 "Accept-Language": "ja,en;q=0.5",
                 "Connection": "keep-alive",
@@ -126,12 +129,15 @@ class DLLinkParser(HTMLParser):
                 "Host": "jtl.re",
                 "Referer": self.referer,
                 "Upgrade-Insecure-Requests": "1",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64;"
+                + " rv:97.0) Gecko/20100101 Firefox/97.0",
             }
             href = d.get("href", "")
             if href is not None:
                 fname = re.search(r"\/([\w\-\.]+\.torrent)$", href)
-                r: requests.Response = requests.post(d.get("href", ""), headers=headers)
+                r: requests.Response = requests.post(
+                    d.get("href", ""), headers=headers  # type: ignore
+                )
                 if fname and type(r.content) is bytes:
                     # print("Output: {}".format(fname[1]))
                     with open(fname[1], mode="wb") as t:
