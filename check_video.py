@@ -324,7 +324,7 @@ def main():
 
         if ret == "":
             syslog.syslog(
-                syslog.LOG_WARNIGN, "Unsupported file name: {}".format(basename)
+                syslog.LOG_WARNING, "Unsupported file name: {}".format(basename)
             )
             ret = basename
 
