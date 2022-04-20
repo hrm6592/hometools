@@ -271,7 +271,7 @@ def main():
             r"_TEST[0-9]$": [None],
             # Exception handling
             r"^\[Ohys\-Raws\]": [None],
-            r"^(?:\d{2}ID|[A-Z]+?)-[0-9]+?$": [None],
+            r"^(?:\d{2}ID|[A-Z]+?)-[0-9]+?$": ["all"],
             # only lower case file names
             r"^(?P<index>[a-z]+?-\d+?$)": ["index"],
             # FC2 and other Uncencored movies
@@ -309,7 +309,9 @@ def main():
         # File name regularization
         for r, idx in re_list.items():
             m = re.search(r, basename, re.X)
-            if m is not None and idx[0] == "index":
+            if m is None:
+                continue
+            elif idx[0] == "index":
                 # TODO: Only "index" key is allowed.
                 #       more flexible pattern should be allowed
                 # print("Match pattern: {}".format(m.re))
@@ -318,7 +320,10 @@ def main():
                 # print("Index: {}".format(m.groupdict().get("index")))
                 ret: str = format(m.groupdict().get("index"))
                 break
-            elif m is not None and idx[0] is None:
+            elif idx[0] == "all":
+                ret: str = basename
+                break
+            elif idx[0] is None:
                 # Action is set to None in re_list
                 return filename.name
 
@@ -337,7 +342,9 @@ def main():
         # Add movie format extension
         ext = get_format_suffix(mi)
         if ext == NotImplementedType:
-            print("Unknown file format: {}".format(mi.format))
+            syslog.syslog(
+                syslog.LOG_WARNING, "Unknown file format: {}".format(mi.format)
+            )
             ret = ret + filename.suffix
         else:
             ret = ret + ext
