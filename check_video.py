@@ -271,7 +271,7 @@ def main():
             r"_TEST[0-9]$": [None],
             # Exception handling
             r"^\[Ohys\-Raws\]": [None],
-            r"\([\w\-\d]+\)$": [None],
+            r"^(?:\d{2}ID|[A-Z]+?)-[0-9]+?$": [None],
             # only lower case file names
             r"^(?P<index>[a-z]+?-\d+?$)": ["index"],
             # FC2 and other Uncencored movies
@@ -322,8 +322,10 @@ def main():
                 # Action is set to None in re_list
                 return filename.name
 
-        if ret == "" or re.match(r"^(?:\d{2}ID|[a-zA-Z]+?)-[0-9]+?$", basename):
-            # File has already regularized name....
+        if ret == "":
+            syslog.syslog(
+                syslog.LOG_WARNIGN, "Unsupported file name: {}".format(basename)
+            )
             ret = basename
 
         # Convert alphabet to upper case.
