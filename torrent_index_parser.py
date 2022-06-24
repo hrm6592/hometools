@@ -81,7 +81,7 @@ class RedirectorParser(HTMLParser):
                 "Accept-Language": "ja,en;q=0.5",
                 "Connection": "keep-alive",
                 "DNT": "1",
-                "Host": "r.jtl.re",
+                "Host": "r.1img.tk",
                 "Referer": "http://javtorrent.re/",
                 "Upgrade-Insecure-Requests": "1",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64;"
@@ -89,7 +89,7 @@ class RedirectorParser(HTMLParser):
             }
             href = d.get("href", "")
             if href is not None:
-                href = "http://r.jtl.re" + href
+                href = "http://r.1img.tk" + href
                 print("href: {}".format(href))
                 r: requests.Response = requests.post(href, headers=headers)
                 dlp = DLLinkParser(referer=str(href))
@@ -126,7 +126,7 @@ class DLLinkParser(HTMLParser):
                 "Accept-Language": "ja,en;q=0.5",
                 "Connection": "keep-alive",
                 "DNT": "1",
-                "Host": "jtl.re",
+                "Host": "r.1img.tk",
                 "Referer": self.referer,
                 "Upgrade-Insecure-Requests": "1",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64;"
