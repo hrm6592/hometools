@@ -90,7 +90,7 @@ class RedirectorParser(HTMLParser):
             href = d.get("href", "")
             if href is not None:
                 href = "http://r.1img.tk" + href
-                print("href: {}".format(href))
+                # print("href: {}".format(href))
                 r: requests.Response = requests.post(href, headers=headers)
                 dlp = DLLinkParser(referer=str(href))
                 dlp.feed(r.text)
@@ -99,11 +99,12 @@ class RedirectorParser(HTMLParser):
 
 class DLLinkParser(HTMLParser):
     def __init__(
-        self, referer: str = "http://r.jtl.re/", convert_charrefs: bool = ...
+        self, referer: str = "http://r.1img.tk/", convert_charrefs: bool = ...
     ) -> None:
         super().__init__(convert_charrefs=convert_charrefs)
         self.flag_found_torrent: bool = False
         self.referer: str = referer
+        # print("Referer: {}".format(referer))
 
     def handle_starttag(
         self,
@@ -126,7 +127,7 @@ class DLLinkParser(HTMLParser):
                 "Accept-Language": "ja,en;q=0.5",
                 "Connection": "keep-alive",
                 "DNT": "1",
-                "Host": "r.1img.tk",
+                "Host": "1img.tk",
                 "Referer": self.referer,
                 "Upgrade-Insecure-Requests": "1",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64;"
@@ -135,9 +136,8 @@ class DLLinkParser(HTMLParser):
             href = d.get("href", "")
             if href is not None:
                 fname = re.search(r"\/([\w\-\.]+\.torrent)$", href)
-                r: requests.Response = requests.post(
-                    d.get("href", ""), headers=headers  # type: ignore
-                )
+                print("href: {}".format(href))
+                r: requests.Response = requests.post(href, headers=headers)
                 if fname and type(r.content) is bytes:
                     # print("Output: {}".format(fname[1]))
                     with open(fname[1], mode="wb") as t:
