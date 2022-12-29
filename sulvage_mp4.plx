@@ -22,7 +22,7 @@ our $home       = $opts{'h'} ||= '/var/spool/torrent';
 our $mi         = '/usr/bin/env mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.13a';
+our $version    = '0.6.13b';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
@@ -202,7 +202,7 @@ DIR: foreach my $d (@Directories) {
             (
                $f =~ /^(?:hhd800.com@)?
                         (FC2\-PPV)\-
-                        (\d+?)
+                        (\d+)
                         [\-\_]?
                         (\d+)?\.mp4$/x
             )
@@ -212,7 +212,7 @@ DIR: foreach my $d (@Directories) {
             # FC2-PPV-809942_1.mp4
             # hhd800.com@FC2-PPV-3069918.mp4
             # heyzo_hd_1613_full.mp4
-            $insignia  = lc($1);
+            $insignia  = $1;
             $number    = $2;
             $subnumber = ( defined $3 ) ? $3 : "none";
             if ( $subnumber ne 'none' ) {
@@ -226,12 +226,11 @@ DIR: foreach my $d (@Directories) {
                 $isSplit = 1;
                 next DIR;
             }
-            elsif (     ( $subnumber eq 'none' )
-                    and ( grep ( /fc2\-ppv|heyzo/, $insignia ) ) )
-            {
+            elsif ( $subnumber eq 'none' ) {
+
                 # This movie is one file. Not separated.
                 $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
-                $fname = ucfirst($insignia) . '-' . $number;
+                $fname = $insignia . '-' . $number;
                 $ext   = 'mp4';
             }
             else {
