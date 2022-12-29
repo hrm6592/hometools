@@ -22,7 +22,7 @@ our $home       = $opts{'h'} ||= '/var/spool/torrent';
 our $mi         = '/usr/bin/env mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.13';
+our $version    = '0.6.13a';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
@@ -130,7 +130,7 @@ DIR: foreach my $d (@Directories) {
             # 062818_295-paco-1080p.mp4
             # hhd800.com@051922_001-1PON.mp4
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
-            $fname = $1 . "." . $2;
+            $fname = $1 . "." . lc($2);
             $ext   = 'mp4';
         }
         elsif (
