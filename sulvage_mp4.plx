@@ -22,7 +22,7 @@ our $home       = $opts{'h'} ||= '/var/spool/torrent';
 our $mi         = '/usr/bin/env mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.12a';
+our $version    = '0.6.13';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
@@ -117,17 +117,18 @@ DIR: foreach my $d (@Directories) {
             $ext = 'mp4';
         }
         elsif (
-            $f =~ /^([\d_\-]+?)\-
+            $f =~ /^(?:hhd800.com@)?
+                   ([\d_\-]+?)\-
                    (1pon|carib|10mu|paco)
-                   \-
-                   1080p
-                   \.mp4$/x
+                   (?:-1080p)?
+                   \.mp4$/ix
           )
         {
             # 102817_598-1pon-1080p.mp4
             # 111817-541-carib-1080p.mp4
             # 010518_01-10mu-1080p.mp4
             # 062818_295-paco-1080p.mp4
+            # hhd800.com@051922_001-1PON.mp4
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
             $fname = $1 . "." . $2;
             $ext   = 'mp4';
@@ -197,11 +198,19 @@ DIR: foreach my $d (@Directories) {
             $fname = uc($1) . '-' . $2;
             $ext   = 'mp4';
         }
-        elsif ( ( $f =~ /^(FC2\-PPV)\-(\d+?)[\-\_]?(\d+)?\.mp4$/ )
-             or ( $f =~ /^(heyzo)(?:_hd)?(?:[\-_]+)(\d+)(?:_full)?\.mp4$/ )
+        elsif (
+            (
+               $f =~ /^(?:hhd800.com@)?
+                        (FC2\-PPV)\-
+                        (\d+?)
+                        [\-\_]?
+                        (\d+)?\.mp4$/x
+            )
+            or ( $f =~ /^(heyzo)(?:_hd)?(?:[\-_]+)(\d+)(?:_full)?\.mp4$/ )
           )
         {
             # FC2-PPV-809942_1.mp4
+            # hhd800.com@FC2-PPV-3069918.mp4
             # heyzo_hd_1613_full.mp4
             $insignia  = lc($1);
             $number    = $2;
