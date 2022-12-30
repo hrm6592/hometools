@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import re
 import sqlite3
 import syslog
@@ -219,7 +220,7 @@ class _db:
 
 
 def main():
-    syslog.openlog(acility=syslog.LOG_LOCAL2)  # type: ignore
+    syslog.openlog(facility=syslog.LOG_LOCAL2)  # type: ignore
 
     def get_height_suffix(mi: _movie_info) -> str:
         """Get height information to add suffix to filename.
@@ -430,7 +431,7 @@ def main():
     if not Path.is_dir(args.home):
         raise NotADirectoryError
     home_entries = Path(args.home)
-    chdir(home_entries.resolve())
+    os.chdir(home_entries.resolve())
 
     # Preparing DB.
     if not Path.is_dir(args.dbhome):
