@@ -10,8 +10,7 @@ from datetime import timedelta
 from pathlib import Path
 from subprocess import PIPE, Popen
 from types import NotImplementedType
-
-from typing_extensions import Self
+from typing import Self
 
 
 @dataclass
