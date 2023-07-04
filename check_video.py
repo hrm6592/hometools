@@ -52,9 +52,14 @@ class _movie_info:
             [_movie_info]: Movie information.
         """
         # print("Target: {}".format(movie))
-        opt = "--Output=General;%FileName%/%Duration%/%Format%/\r\nVideo;%Height%/%Format%/%FrameRate%"
+        opt = "--Output=General;%FileName%/%Duration%/%Format%/\r\n" + \
+            "Video;%Height%/%Format%/%FrameRate%"
         proc = Popen(
-            [self.__cmd, opt, movie], stdin=None, stdout=PIPE, stderr=PIPE, text=True
+            [self.__cmd, opt, movie],
+            stdin=None,
+            stdout=PIPE,
+            stderr=PIPE,
+            text=True
         )
         out, _ = proc.communicate()
 
@@ -73,7 +78,7 @@ class _movie_info:
                 syslog.LOG_WARNING,  # type: ignore
                 "{} failed for {}".format(self.__cmd, movie),
             )
-            syslog.syslog(syslog.LOG_INFO, out)  # type: ignore
+            syslog.syslog(syslog.LOG_INFO, out)
             return None
 
         # Round down after the decimal point
@@ -81,18 +86,20 @@ class _movie_info:
 
         try:
             self.duration = timedelta(
-                seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
+                seconds=int(self.duration[:-3]),
+                microseconds=int(self.duration[-3:])
             ) / timedelta(hours=1)
             self.duration = "{:.3f}".format(self.duration)
         except ValueError:
             syslog.syslog(  # type: ignore
                 syslog.LOG_WARNING,  # type: ignore
-                "{} returned invalid duration for {}".format(self.__cmd, movie),
+                "{} returned invalid duration for {}".format(
+                    self.__cmd, movie),
             )
             syslog.syslog(syslog.LOG_INFO, out)  # type: ignore
             return None
 
-        return self
+        return self  # type: ignore
 
     def get_filename(self) -> str:
         return self.name
@@ -134,12 +141,13 @@ class _db:
             cur.close
             con.close
 
-    def search_entry(self, filename: str) -> list[_movie_info]:
+    def search_entry(self, filename: str) -> "list[_movie_info]":
         con = sqlite3.connect(self.dbname)
         con.row_factory = sqlite3.Row
         ret: list[_movie_info] = []
         cur = con.cursor()
-        cur.execute("SELECT * FROM movie WHERE name LIKE ?;", (filename + "%",))
+        cur.execute("SELECT * FROM movie WHERE name LIKE ?;",
+                    (filename + "%",))
         for row in cur.fetchall():
             r = _movie_info()
             r.name = row["name"]
@@ -181,17 +189,18 @@ class _db:
         con = sqlite3.connect(self.dbname)
         try:
             with con:
-                syslog.syslog(  # type: ignore
-                    syslog.LOG_NOTICE,  # type: ignore
+                syslog.syslog(
+                    syslog.LOG_NOTICE,
                     "Deleting {} from DB...".format(name),
-                )  # type: ignore
+                )
                 return con.execute(
                     "DELETE FROM movie WHERE name='{}';".format(name)
                 ).rowcount
         except sqlite3.IntegrityError:
-            syslog.syslog(  # type: ignore
-                syslog.LOG_ERR, "Entry {} cannot delete".format(name)  # type: ignore
-            )  # type: ignore
+            syslog.syslog(
+                syslog.LOG_ERR, "Entry {} cannot delete".format(
+                    name)
+            )
             return -1
         finally:
             con.close
@@ -200,16 +209,16 @@ class _db:
         con = sqlite3.connect(self.dbname)
         try:
             with con:
-                syslog.syslog(  # type: ignore
-                    syslog.LOG_NOTICE, "Execute vacuum command on DB..."  # type: ignore
+                syslog.syslog(
+                    syslog.LOG_NOTICE, "Execute vacuum command on DB..."
                 )
                 con.execute("VACUUM;")
         except sqlite3.IntegrityError:
-            syslog.syslog(syslog.LOG_ERR, "Cannot vacuum DB!")  # type: ignore
+            syslog.syslog(syslog.LOG_ERR, "Cannot vacuum DB!")
         finally:
             con.close
 
-    def get_all_entry(self) -> list[str]:
+    def get_all_entry(self) -> "list[str]":
         con = sqlite3.connect(self.dbname)
         ret: list[str] = []
         with con:
@@ -238,7 +247,7 @@ def main():
         else:
             return ""
 
-    def get_format_suffix(mi: _movie_info) -> str:
+    def get_format_suffix(mi: _movie_info) -> "str":
         """Check movie format and return proper suffix
 
         Args:
@@ -256,7 +265,7 @@ def main():
             "BDAV": ".m2ts",
             "Matroska": ".mkv",
         }
-        return sfx_list[format] if (f for f in [sfx_list.keys]) else NotImplementedType
+        return sfx_list[format]
 
     def regularization(filename: Path, mi: _movie_info) -> str:
         """Regularize file name of movie.
@@ -396,7 +405,8 @@ def main():
         help="Force re-analyse all files in torrent directory",
     )
     arg_group2 = parser.add_argument_group(
-        "actions", "Specify other action instead of scan and rename target directry"
+        "actions", "Specify other action instead of scan "
+        + "and rename target directry"
     )
     arg_group2.add_argument(
         "-d",
@@ -491,8 +501,8 @@ def main():
             if len(sr) == 0:
                 db.add_entry(file)
 
-    syslog.syslog(syslog.LOG_INFO, "Movie check done. exit.")  # type: ignore
-    syslog.closelog()  # type: ignore
+    syslog.syslog(syslog.LOG_INFO, "Movie check done. exit.")
+    syslog.closelog()
     return 0
 
 
