@@ -74,8 +74,8 @@ class _movie_info:
                 self.fps,
             ] = out.split("/")
         except ValueError:
-            syslog.syslog(  # type: ignore
-                syslog.LOG_WARNING,  # type: ignore
+            syslog.syslog(
+                syslog.LOG_WARNING,
                 "{} failed for {}".format(self.__cmd, movie),
             )
             syslog.syslog(syslog.LOG_INFO, out)
@@ -91,15 +91,15 @@ class _movie_info:
             ) / timedelta(hours=1)
             self.duration = "{:.3f}".format(self.duration)
         except ValueError:
-            syslog.syslog(  # type: ignore
-                syslog.LOG_WARNING,  # type: ignore
+            syslog.syslog(
+                syslog.LOG_WARNING,
                 "{} returned invalid duration for {}".format(
                     self.__cmd, movie),
             )
-            syslog.syslog(syslog.LOG_INFO, out)  # type: ignore
+            syslog.syslog(syslog.LOG_INFO, out)
             return None
 
-        return self  # type: ignore
+        return self
 
     def get_filename(self) -> str:
         return self.name
@@ -117,8 +117,8 @@ class _db:
     def init_db(self, dbname: str):
         # Make file if not exist.
         if not Path(dbname).is_file():
-            syslog.syslog(  # type: ignore
-                syslog.LOG_WARNING,  # type: ignore
+            syslog.syslog(
+                syslog.LOG_WARNING,
                 "DB is not exist. So we make it to {}".format(dbname),
             )
 
@@ -228,7 +228,7 @@ class _db:
 
 
 def main():
-    syslog.openlog(facility=syslog.LOG_LOCAL2)  # type: ignore
+    syslog.openlog(facility=syslog.LOG_LOCAL2)
 
     def get_height_suffix(mi: _movie_info) -> str:
         """Get height information to add suffix to filename.
@@ -344,8 +344,8 @@ def main():
                 return filename.name
 
         if ret == "":
-            syslog.syslog(  # type: ignore
-                syslog.LOG_WARNING,  # type: ignore
+            syslog.syslog(
+                syslog.LOG_WARNING,
                 "Unsupported file name: {}".format(basename),
             )
             ret = basename
@@ -359,8 +359,8 @@ def main():
         # Add movie format extension
         ext = get_format_suffix(mi)
         if ext == NotImplementedType:
-            syslog.syslog(  # type: ignore
-                syslog.LOG_WARNING,  # type: ignore
+            syslog.syslog(
+                syslog.LOG_WARNING,
                 "Unknown file format: {}".format(mi.format),
             )
             ret = ret + filename.suffix
@@ -434,8 +434,8 @@ def main():
     args = parser.parse_args()
 
     # Set HOME directory to work with.
-    syslog.syslog(  # type: ignore
-        syslog.LOG_INFO, "Check files in {}".format(args.home)  # type: ignore
+    syslog.syslog(
+        syslog.LOG_INFO, "Check files in {}".format(args.home)
     )
     if not Path.is_dir(args.home):
         raise NotADirectoryError
@@ -450,14 +450,14 @@ def main():
 
     # Delete specified entry from DB
     if args.delete is not None:
-        syslog.syslog(syslog.LOG_INFO, "Delete MODE")  # type: ignore
+        syslog.syslog(syslog.LOG_INFO, "Delete MODE")
         for d in args.delete:
             db.del_entry(d)
         return 3
 
     # Rescan mode.
     if args.rescan is True:
-        syslog.syslog(syslog.LOG_INFO, "Rescan MODE")  # type: ignore
+        syslog.syslog(syslog.LOG_INFO, "Rescan MODE")
         rescan_home(home_entries.resolve())
         db.vacuum_table()
         return 4
@@ -478,8 +478,8 @@ def main():
         elif e.is_file() and target_suffix.search(e.name):
             file = _movie_info()
             if file.analyze(e.name) is None:
-                syslog.syslog(  # type: ignore
-                    syslog.LOG_WARNING,  # type: ignore
+                syslog.syslog(
+                    syslog.LOG_WARNING,
                     "File analyse failed({})".format(e.name),
                 )
                 continue
