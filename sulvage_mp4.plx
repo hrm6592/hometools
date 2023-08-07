@@ -22,7 +22,7 @@ our $home       = $opts{'h'} ||= '/var/spool/torrent';
 our $mi         = '/usr/bin/env mediainfo';
 our $mi_options = '--Output=Video;%Width%';
 our $log        = $opts{'l'} ||= 'sulvage_mp4.log';
-our $version    = '0.6.13b';
+our $version    = '0.6.14';
 our @ignoreList = ( "Series", "SingleFeatuerd", "Anime", "TEST" );
 our $opening    = "Sulvage mp4 file(s) Tool Ver. $version";
 our $TestSpeach = 'TEST mode enabled. DO NOT move and remove_tree()';
