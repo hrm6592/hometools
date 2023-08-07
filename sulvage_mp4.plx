@@ -281,6 +281,18 @@ DIR: foreach my $d (@Directories) {
             $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
             $ext   = $3;
         }
+        elsif (
+            $f =~ /^(?:gg5.co@)
+                   ([A-Za-z]+?)-(\d{3})
+                   (?:-C_GG5)
+                   \.(mp4|mkv)/x
+          )
+        {
+            # gg5.co@MDON-036-C_GG5.mp4
+            $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
+            $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
+            $ext   = $3;
+        }
         else {
             # Invalid useless videos.
             print $logfh "\tNOTICE: INVALID: $d/$f\n";
