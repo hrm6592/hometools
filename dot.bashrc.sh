@@ -1,3 +1,4 @@
+#!/bin/bash
 # .bashrc
 
 # User specific aliases and functions
@@ -9,7 +10,8 @@ alias ls15='ls -1tr [0-9A-Z]*.* | grep -v "jpg\|mp3\|added\|incomplete" | head -
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
+    # shellcheck source=/etc/bashrc
+    source /etc/bashrc
 fi
 
 function lln () {
