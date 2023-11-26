@@ -283,7 +283,7 @@ DIR: foreach my $d (@Directories) {
         }
         elsif (
             $f =~ /^(?:gg5.co@)
-                   ([A-Za-z]+?)-(\d{3})
+                   ([A-Za-z]+?)-(\d{2,3})
                    (?:-C_GG5)
                    \.(mp4|mkv)/x
           )
