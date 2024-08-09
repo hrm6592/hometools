@@ -16,9 +16,7 @@ class IndexParser(HTMLParser):
         self.link: str | None = ""
         self.dl: dict[str, str] = download_links
 
-    def handle_starttag(self,
-                        tag: str,
-                        attrs: List[tuple[str, Optional[str]]]):
+    def handle_starttag(self, tag: str, attrs: List[tuple[str, Optional[str]]]):
         d: Dict[str, str | None] = dict(attrs)
         if "rel" in d and d["rel"] == "bookmark":
             self.flag_id_tag = True
@@ -51,7 +49,7 @@ class RedirectorParser(HTMLParser):
         ):
             href = d.get("href", "")
             # print("href: {}".format(href))
-            r: requests.Response = requests.post(href)  # type: ignore
+            r: requests.Response = requests.post(href, timeout=20)
             dlp = DLLinkParser_mgate_xyz(href)
             dlp.feed(r.text)
             return
@@ -106,10 +104,7 @@ class DLLinkParser_r_1img_tk(HTMLParser):
 
 class DLLinkParser_mgate_xyz(HTMLParser):
 
-    def __init__(self,
-                 target: str | None,
-                 *,
-                 convert_charrefs: bool = True) -> None:
+    def __init__(self, target: str | None, *, convert_charrefs: bool = True) -> None:
         super().__init__(convert_charrefs=convert_charrefs)
         self.flg_found_torrent_id: bool = False
         self.dlid: int = 0
@@ -156,7 +151,8 @@ class DLLinkParser_mgate_xyz(HTMLParser):
             print(f"{self.dlid} : {self.target}")
             fname = f"{self.dlid}.torrent"
             r: requests.Response = requests.post(
-                self.target, headers=header)  # type: ignore
+                self.target, headers=header, timeout=10
+            )
             if fname and type(r.content) is bytes:
                 print(f"Output: {fname}")
                 with open(fname, mode="wb") as t:
