@@ -8,9 +8,9 @@ import syslog
 from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, TimeoutExpired
 from types import NotImplementedType
-from typing import Self
+from typing import List, Self
 
 
 @dataclass
@@ -52,14 +52,23 @@ class _movie_info:
             [_movie_info]: Movie information.
         """
         # print("Target: {}".format(movie))
-        opt = (
-            "--Output=General;%FileName%/%Duration%/%Format%/\r\n"
-            + "Video;%Height%/%Format%/%FrameRate%"
-        )
+        # opt = (
+        #     "--Output=General;%FileName%/%Duration%/%Format%/"
+        #     + chr(13) + "Video;%Height%/%Format%/%FrameRate%"
+        # )
+        opt = "--Output=file:///var/lib/misc/chech_video.template.txt"
         proc = Popen(
             [self.__cmd, opt, movie], stdin=None, stdout=PIPE, stderr=PIPE, text=True
         )
-        out, _ = proc.communicate(timeout=5.0)
+        try:
+            out, _ = proc.communicate(timeout=15.0)
+        except TimeoutExpired as e:
+            syslog.syslog(
+                syslog.LOG_WARNING,
+                "{} failed for {}".format(self.__cmd, movie),
+            )
+            syslog.syslog(syslog.LOG_INFO, ",".join(e.cmd))
+            return None
 
         # Split output into proper variables.
         try:
@@ -114,8 +123,7 @@ class _db:
         # Make file if not exist.
         if not Path(dbname).is_file():
             syslog.syslog(
-                syslog.LOG_WARNING,
-                f"DB is not exist. So we make it to {dbname}"
+                syslog.LOG_WARNING, f"DB is not exist. So we make it to {dbname}"
             )
 
             # Initialize table for store datas.
@@ -268,7 +276,7 @@ def main():
         ret: str = ""
         basename = filename.stem
         # print("Type: {}".format(type(basename)))
-        re_list = {
+        re_list: dict[str, List[None] | List[str]] = {
             # Already renamed for re-encoding.
             r"(?:720|1080)p$": [None],
             # My encording test files.
