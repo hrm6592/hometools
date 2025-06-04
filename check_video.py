@@ -52,16 +52,14 @@ class _movie_info:
             [_movie_info]: Movie information.
         """
         # print("Target: {}".format(movie))
-        opt = "--Output=General;%FileName%/%Duration%/%Format%/\r\n" + \
-            "Video;%Height%/%Format%/%FrameRate%"
-        proc = Popen(
-            [self.__cmd, opt, movie],
-            stdin=None,
-            stdout=PIPE,
-            stderr=PIPE,
-            text=True
+        opt = (
+            "--Output=General;%FileName%/%Duration%/%Format%/\r\n"
+            + "Video;%Height%/%Format%/%FrameRate%"
         )
-        out, _ = proc.communicate()
+        proc = Popen(
+            [self.__cmd, opt, movie], stdin=None, stdout=PIPE, stderr=PIPE, text=True
+        )
+        out, _ = proc.communicate(timeout=5.0)
 
         # Split output into proper variables.
         try:
@@ -86,15 +84,13 @@ class _movie_info:
 
         try:
             self.duration = timedelta(
-                seconds=int(self.duration[:-3]),
-                microseconds=int(self.duration[-3:])
+                seconds=int(self.duration[:-3]), microseconds=int(self.duration[-3:])
             ) / timedelta(hours=1)
-            self.duration = "{:.3f}".format(self.duration)
+            self.duration = f"{self.duration:.3f}"
         except ValueError:
             syslog.syslog(
                 syslog.LOG_WARNING,
-                "{} returned invalid duration for {}".format(
-                    self.__cmd, movie),
+                f"{self.__cmd} returned invalid duration for {movie}",
             )
             syslog.syslog(syslog.LOG_INFO, out)
             return None
@@ -119,7 +115,7 @@ class _db:
         if not Path(dbname).is_file():
             syslog.syslog(
                 syslog.LOG_WARNING,
-                "DB is not exist. So we make it to {}".format(dbname),
+                f"DB is not exist. So we make it to {dbname}"
             )
 
             # Initialize table for store datas.
@@ -146,8 +142,7 @@ class _db:
         con.row_factory = sqlite3.Row
         ret: list[_movie_info] = []
         cur = con.cursor()
-        cur.execute("SELECT * FROM movie WHERE name LIKE ?;",
-                    (filename + "%",))
+        cur.execute("SELECT * FROM movie WHERE name LIKE ?;", (filename + "%",))
         for row in cur.fetchall():
             r = _movie_info()
             r.name = row["name"]
@@ -191,16 +186,11 @@ class _db:
             with con:
                 syslog.syslog(
                     syslog.LOG_NOTICE,
-                    "Deleting {} from DB...".format(name),
+                    f"Deleting {name} from DB...",
                 )
-                return con.execute(
-                    "DELETE FROM movie WHERE name='{}';".format(name)
-                ).rowcount
+                return con.execute(f"DELETE FROM movie WHERE name='{name}';").rowcount
         except sqlite3.IntegrityError:
-            syslog.syslog(
-                syslog.LOG_ERR, "Entry {} cannot delete".format(
-                    name)
-            )
+            syslog.syslog(syslog.LOG_ERR, f"Entry {name} cannot delete")
             return -1
         finally:
             con.close
@@ -209,9 +199,7 @@ class _db:
         con = sqlite3.connect(self.dbname)
         try:
             with con:
-                syslog.syslog(
-                    syslog.LOG_NOTICE, "Execute vacuum command on DB..."
-                )
+                syslog.syslog(syslog.LOG_NOTICE, "Execute vacuum command on DB...")
                 con.execute("VACUUM;")
         except sqlite3.IntegrityError:
             syslog.syslog(syslog.LOG_ERR, "Cannot vacuum DB!")
@@ -405,8 +393,8 @@ def main():
         help="Force re-analyse all files in torrent directory",
     )
     arg_group2 = parser.add_argument_group(
-        "actions", "Specify other action instead of scan "
-        + "and rename target directry"
+        "actions",
+        "Specify other action instead of scan and rename target directry",
     )
     arg_group2.add_argument(
         "-d",
@@ -434,9 +422,7 @@ def main():
     args = parser.parse_args()
 
     # Set HOME directory to work with.
-    syslog.syslog(
-        syslog.LOG_INFO, "Check files in {}".format(args.home)
-    )
+    syslog.syslog(syslog.LOG_INFO, f"Check files in {args.home}")
     if not Path.is_dir(args.home):
         raise NotADirectoryError
     home_entries = Path(args.home)
