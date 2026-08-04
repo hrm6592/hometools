@@ -29,7 +29,7 @@ class IndexParser(HTMLParser):
 
 
 class RedirectorParser(HTMLParser):
-    def __init__(self, dllink: str = "", convert_charrefs: bool = ...) -> None:
+    def __init__(self, dllink: str = "", convert_charrefs: bool = True) -> None:
         super().__init__(convert_charrefs=convert_charrefs)
         self.flag_found_torrent: bool = False
         self.dllink: str = dllink
@@ -47,7 +47,9 @@ class RedirectorParser(HTMLParser):
             and d.get("rel") == "follow"
             and re.search("mgate.xyz", d.get("href", ""))  # type: ignore
         ):
-            href = d.get("href", "")
+            href = d.get("href")
+            if href is None:
+                return
             # print("href: {}".format(href))
             r: requests.Response = requests.post(href, timeout=20)
             dlp = DLLinkParser_mgate_xyz(href)
@@ -57,7 +59,7 @@ class RedirectorParser(HTMLParser):
 
 class DLLinkParser_r_1img_tk(HTMLParser):
     def __init__(
-        self, referer: str = "http://r.1img.tk/", convert_charrefs: bool = ...
+        self, referer: str = "http://r.1img.tk/", convert_charrefs: bool = True
     ) -> None:
         super().__init__(convert_charrefs=convert_charrefs)
         self.flag_found_torrent: bool = False
@@ -148,6 +150,8 @@ class DLLinkParser_mgate_xyz(HTMLParser):
 
             self.flg_found_torrent_id = False
             self.dlid = int(d.get("value", "0"))  # type: ignore
+            if self.target is None:
+                return
             print(f"{self.dlid} : {self.target}")
             fname = f"{self.dlid}.torrent"
             r: requests.Response = requests.post(
