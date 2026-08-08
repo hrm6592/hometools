@@ -261,7 +261,7 @@ DIR: foreach my $d (@Directories) {
             $ext   = 'mp4';
         }
         elsif (
-            $f =~ /^(?:freedl|chd1080|hhd800)\.(?:com|org)\@
+            $f =~ /^(?:freedl|chd1080|hhd800|4k688)\.(?:com|org)\@
                    (?:nomask60fps_|\d{3})?
                    ([a-zA-Z]+?|\d{2}ID)
                    \-?
@@ -277,6 +277,7 @@ DIR: foreach my $d (@Directories) {
             # hhd800.com@KTRA-289E.mp4
             # 29ID-024/hhd800.com@29ID-024.mp4
             # freedl.org@BBAN-381.mp4
+            # NACT-166/4k688.com@NACT-166.mp4
             $isFHD = ( `$mi $mi_options $d/$f` == 1920 ) ? 1 : 0;
             $fname = uc($1) . '-' . sprintf( "%03d", "$2" );
             $ext   = $3;
