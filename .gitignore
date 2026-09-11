@@ -1,5 +1,7 @@
 -- SQLite.sql
 .vscode
+.venv
 desktop.ini
 test
 __pycache__
+src
