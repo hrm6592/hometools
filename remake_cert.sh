@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd /root/cert
+pushd /root/cert || exit
 
 # File check
 rm -f *.pem
@@ -65,4 +65,5 @@ certtool \
   --load-ca-certificate certificate_authority_certificate.pem \
   --load-ca-privkey certificate_authority_key.pem \
   --outfile admin_desktop_client_certificate.pem
-popd
+
+popd || exit
