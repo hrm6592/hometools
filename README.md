@@ -63,7 +63,7 @@
 
 必要なランタイムや依存ツールはスクリプトごとに異なります。
 
-- **Python**: [pyproject.toml](pyproject.toml) は Python **3.14 以上**を指定し、`.python-version` も `3.14` です。`check_video.py` と `clear_torrent_files.py` は `syslog` を読み込むため、Unix 環境で利用します。
+- **Python**: [pyproject.toml](pyproject.toml) は Python **3.15 以上**を指定し、`.python-version` は `3.15.0` です。`check_video.py` と `clear_torrent_files.py` は `syslog` を読み込むため、Unix 環境で利用します。
 - **Bash / Perl**: 主に Linux 向けです。MediaInfo、MPlayer、Avidemux などは使うツールに応じて別途用意します。
 - **Windows**: `.bat` はコマンドプロンプト、`Remove-KB.ps1` は Windows PowerShell を前提としています。
 - **CoffeeScript**: 既存の Hubot 環境に組み込むコードです。このフォルダーには Node.js の依存関係を定義する `package.json` はありません。
