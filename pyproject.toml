@@ -7,7 +7,10 @@ authors = [
     { name = "Masahisa Hori", email = "hrm.html@gmail.com" }
 ]
 requires-python = ">=3.15"
-dependencies = []
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "requests>=2.34.2",
+]
 
 [project.scripts]
 tools = "tools:main"

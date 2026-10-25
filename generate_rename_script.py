@@ -1,7 +1,8 @@
 #!/bin/env python
+import argparse
 import os
-import sys
 import re
+import sys
 from scrapers import DMMScraper, AVWikiScraper, AVWikiDBScraper, MissAVScraper
 
 
@@ -106,13 +107,16 @@ def process_file(filepath: str) -> dict | None:
 
 def main():
     """メイン処理"""
-    if len(sys.argv) != 2:
-        print(
-            f"使用法: python {sys.argv[0]} <ファイルリストが書かれたテキストファイル>"
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="動画ファイル一覧からリネーム用シェルスクリプトを生成します。"
+    )
+    parser.add_argument(
+        "input_file",
+        help="処理する動画ファイルのパスを1行ずつ記載したテキストファイル",
+    )
+    args = parser.parse_args()
 
-    input_file = sys.argv[1]
+    input_file = args.input_file
     if not os.path.isfile(input_file):
         print(f"エラー: ファイルリスト '{input_file}' が見つかりません。")
         sys.exit(1)
