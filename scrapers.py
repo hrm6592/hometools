@@ -1,10 +1,24 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
+"""動画情報サイトからタイトルと出演者を取得するスクレイパー。"""
+
 import re
+from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from typing import TypedDict
+
 import requests
 from bs4 import BeautifulSoup
-from abc import ABC, abstractmethod
+from bs4.element import Tag
+
+
+class ScrapeResult(TypedDict):
+    """スクレイパーが返す動画情報。"""
+
+    title: str
+    performers: list[str]
+    source: str
 
 
 class BaseScraper(ABC):
@@ -16,15 +30,23 @@ class BaseScraper(ABC):
         self.model_number = model_number.upper()
         self.cid = model_number.lower().replace("-", "")
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/58.0.3029.110 Safari/537.3"
+            )
         }
         self.source_name = "Unknown"
 
-    def _get_soup(self, url: str, **kwargs) -> BeautifulSoup | None:
+    def _get_soup(
+        self, url: str, *, cookies: dict[str, str] | None = None
+    ) -> BeautifulSoup | None:
         """指定されたURLからBeautifulSoupオブジェクトを取得する"""
         print(f"  [{self.source_name}] 検索中... (URL: {url})")
         try:
-            response = requests.get(url, timeout=10, headers=self.headers, **kwargs)
+            response = requests.get(
+                url, timeout=10, headers=self.headers, cookies=cookies
+            )
             response.raise_for_status()
             return BeautifulSoup(response.text, "html.parser")
         except requests.exceptions.RequestException as e:
@@ -32,7 +54,7 @@ class BaseScraper(ABC):
             return None
 
     @abstractmethod
-    def fetch_info(self) -> dict | None:
+    def fetch_info(self) -> ScrapeResult | None:
         """
         Webサイトからタイトルと出演者情報を取得する。
         成功した場合は {'title': str, 'performers': list[str], 'source': str} を返す。
@@ -61,17 +83,16 @@ class BaseScraper(ABC):
             )
         return None
 
-    def _extract_unique_performers(self, elements: list) -> list[str]:
+    def _extract_unique_performers(self, elements: Iterable[Tag]) -> list[str]:
         """
         BeautifulSoupの要素リストから、重複を除いた出演者名のリストを抽出する。
         """
-        if not elements:
-            return []
-
-        unique_performers = set(p.get_text(strip=True) for p in elements)
+        unique_performers: set[str] = {
+            element.get_text(strip=True) for element in elements
+        }
 
         # 不要な文字列を除外
-        final_performers = []
+        final_performers: list[str] = []
         for name in unique_performers:
             if "女優ランキング" in name or not name:
                 continue
@@ -90,7 +111,7 @@ class DMMScraper(BaseScraper):
         self.title_selector = "#title"
         self.performers_selector = "#performer a"
 
-    def fetch_info(self) -> dict | None:
+    def fetch_info(self) -> ScrapeResult | None:
         search_url = self.url_template.format(cid=self.cid)
         cookies = {"age_check_done": "1"}
         soup = self._get_soup(search_url, cookies=cookies)
@@ -121,7 +142,7 @@ class AVWikiScraper(BaseScraper):
         self.source_name = "AV-Wiki"
         self.url_template = f"https://av-wiki.net/{self.model_number.lower()}/"
 
-    def fetch_info(self) -> dict | None:
+    def fetch_info(self) -> ScrapeResult | None:
         soup = self._get_soup(self.url_template)
         if not soup:
             return None
@@ -194,7 +215,7 @@ class AVWikiDBScraper(BaseScraper):
         self.source_name = "avwikidb"
         self.url_template = f"https://avwikidb.com/work/{self.model_number}/"
 
-    def fetch_info(self) -> dict | None:
+    def fetch_info(self) -> ScrapeResult | None:
         soup = self._get_soup(self.url_template)
         if not soup:
             return None
@@ -211,7 +232,7 @@ class AVWikiDBScraper(BaseScraper):
         return {"title": title, "performers": performers, "source": self.source_name}
 
     def _fetch_performers(self, soup: BeautifulSoup) -> list[str]:
-        performers = set()
+        performers: set[str] = set()
 
         # 1. <title> の "品番の女優は...｜作品タイトル" 形式から取得
         page_title_tag = soup.find("title")
@@ -251,7 +272,7 @@ class AVWikiDBScraper(BaseScraper):
                         performers.add(name)
 
         # クリーンアップ
-        final_performers = []
+        final_performers: list[str] = []
         for name in performers:
             if "女優ランキング" in name or not name:
                 continue
@@ -298,7 +319,7 @@ class MissAVScraper(BaseScraper):
         self.source_name = "MissAV"
         self.url_template = f"https://missav123.com/dm13/ja/{self.model_number.lower()}"
 
-    def fetch_info(self) -> dict | None:
+    def fetch_info(self) -> ScrapeResult | None:
         soup = self._get_soup(self.url_template)
         if not soup:
             return None

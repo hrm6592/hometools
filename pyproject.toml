@@ -12,6 +12,12 @@ dependencies = [
     "requests>=2.34.2",
 ]
 
+[tool.pyright]
+pythonVersion = "3.15"
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+
 [project.scripts]
 tools = "tools:main"
 
