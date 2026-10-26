@@ -49,6 +49,12 @@
 | [irc.coffee](irc.coffee) | ISO-2022-JP と UTF-8 の変換を含む Hubot 用 IRC アダプター | Hubot、`irc`、`iconv`、`log`。接続設定は `HUBOT_IRC_*` 環境変数を参照 |
 | [hubot-redmine-notifier.coffee](hubot-redmine-notifier.coffee) | Redmine のチケット作成・更新を Hubot に通知 | Redmine Webhook Plugin、Hubot、`log`。受信先は `/hubot/redmine-notify?room=<room>` |
 
+### フィード監視・通知
+
+| ファイル | 用途 | 主な前提・動作 |
+| --- | --- | --- |
+| [mix_feed_slack_notifier.py](mix_feed_slack_notifier.py) | RSS と Mixcloud の新着ミックスを Slack に通知 | Python 標準ライブラリのみ。Slack Incoming Webhook URL を `SLACK_WEBHOOK_URL` に設定し、前回のトラック ID を `.mix_feed_state.json` に保存 |
+
 ### Windows・World of Tanks
 
 | ファイル | 用途 | 主な前提・動作 |
@@ -124,6 +130,21 @@ perl sulvage_mp4.plx -t -h /path/to/videos
 ```bash
 perl 256colors2.pl
 bash mem4screen.sh
+```
+
+### 新着ミックスを Slack に通知
+
+初回実行では現在の最新トラックを状態ファイルへ記録し、通知しません。最初から通知する場合は `--notify-on-first-run` を追加します。
+
+```bash
+export SLACK_WEBHOOK_URL='https://hooks.slack.com/services/...'
+python3 mix_feed_slack_notifier.py
+```
+
+Slack へ投稿せず通知内容を確認する場合は、`--dry-run` を指定します。
+
+```bash
+python3 mix_feed_slack_notifier.py --dry-run --notify-on-first-run
 ```
 
 ## 利用前に確認する設定

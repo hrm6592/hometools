@@ -5,3 +5,4 @@ desktop.ini
 test
 __pycache__
 src
+.mix_feed_state.json
