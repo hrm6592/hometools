@@ -55,6 +55,37 @@
 | --- | --- | --- |
 | [mix_feed_slack_notifier.py](mix_feed_slack_notifier.py) | RSS と Mixcloud の新着ミックスを Slack に通知 | Python 標準ライブラリのみ。Slack Incoming Webhook URL を `SLACK_WEBHOOK_URL` に設定し、前回のトラック ID を `.mix_feed_state.json` に保存 |
 
+### メールバックアップ検索
+
+`search_mail_archive.py` は 7z バックアップ内の `MailAndSettings\Sylpheed\Mailboxes\Mail\inbox` とそのサブフォルダーを一時展開し、件名・本文から指定した文字列を検索します。Sylpheed の数字だけのファイル名（`1`、`1234` など）と `.eml` が対象で、`.sylpheed_cache` などの管理ファイルは検索しません。日付・差出人・件名・アーカイブ内のファイル名を表示します。
+
+```powershell
+# 通常の文字列検索（正規表現の記号も文字として扱う）
+uv run .\search_mail_archive.py 'WF-1000XM4'
+
+# 正規表現で検索
+uv run .\search_mail_archive.py 'ソニー|修理|返送|集荷' --regex
+
+# 一致したメールを指定先の新しいサブフォルダーにコピー
+uv run .\search_mail_archive.py 'WF-1000XM4' --copy 'D:\Home\HRM\Downloads'
+
+# 対象フォルダーのファイル名を確認（解凍なし）
+uv run .\search_mail_archive.py --list-files
+
+# アーカイブ内のフォルダーを絞る
+uv run .\search_mail_archive.py '修理' --folder 'MailAndSettings\Sylpheed\Mailboxes\Mail\inbox\お買い物関係'
+```
+
+検索文字列は必須です（`--list-files` の場合は不要）。通常検索・正規表現検索ともに大文字と小文字を区別しません。通常検索では全角英数字なども正規化します。従来の `--pattern '正規表現'` も使用できます。`--regex` を使う場合、検索対象は正規化した件名と本文を改行で結合したものです。改行をまたいで `.` を一致させる場合は `(?s)` を指定してください。
+
+既定の 7-Zip は `D:\Program Files\7-Zip\7z.exe`、アーカイブは `Z:\Backups\Delphinus\Mail&Settings\MailAndSettings_20241113.7z` です。`--copy DIR` を指定すると、`DIR\mail-search-<自動生成文字列>` に元のフォルダー構造を保持してコピーします。検索結果が0件の場合はコピー先を作成しません。追加の Python パッケージは不要です。
+
+一時展開には指定フォルダー分の空き容量が必要です。一時ファイルは検索後に削除します。`--temp-dir D:\任意の既存フォルダー` で一時展開先の親を変更できます。`--archive`・`--seven-zip` で各パス、`--folder` でアーカイブ内の相対フォルダーを変更できます。
+
+旧ファイル名 `search_wf1000xm4_mail.py` は `search_mail_archive.py` に変更しました。旧 `--copy` フラグと `--downloads` の組み合わせは `--copy DIR` に置き換えてください。回帰テストは `uv run python -m unittest -v test_search_mail_archive.py` で実行できます。
+
+本文は宣言された文字コードを優先して読み、文字コードの指定がない日本語テキストには UTF-8・ISO-2022-JP・CP932・EUC-JP を順に試します。MIME 形式のメールにも対応します。PST・MSG・mbox や添付の PDF・画像は検索対象外です。対象メールがなければ終了コード 2、読み込み・解凍・コピーに失敗した場合は非ゼロで終了します。元のアーカイブは変更しません。
+
 ### Windows・World of Tanks
 
 | ファイル | 用途 | 主な前提・動作 |
