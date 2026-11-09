@@ -100,7 +100,7 @@ uv run .\search_mail_archive.py '修理' --folder 'MailAndSettings\Sylpheed\Mail
 
 必要なランタイムや依存ツールはスクリプトごとに異なります。
 
-- **Python**: [pyproject.toml](pyproject.toml) は Python **3.15 以上**を指定し、`.python-version` は `3.15.0` です。`check_video.py` と `clear_torrent_files.py` は `syslog` を読み込むため、Unix 環境で利用します。
+- **Python**: [pyproject.toml](pyproject.toml) は Python **3.15.2** に固定し、[.python-version](.python-version) も `3.15.2` です。Pyright の `pythonVersion` は言語バージョンを指定するため `3.15` のままです。`check_video.py` と `clear_torrent_files.py` は `syslog` を読み込むため、Unix 環境で利用します。
 - **Bash / Perl**: 主に Linux 向けです。MediaInfo、MPlayer、Avidemux などは使うツールに応じて別途用意します。
 - **Windows**: `.bat` はコマンドプロンプト、`Remove-KB.ps1` は Windows PowerShell を前提としています。
 - **CoffeeScript**: 既存の Hubot 環境に組み込むコードです。このフォルダーには Node.js の依存関係を定義する `package.json` はありません。
@@ -186,6 +186,8 @@ python3 mix_feed_slack_notifier.py --dry-run --notify-on-first-run
 - **旧環境への依存**: SysV init、古い Avidemux CLI、`youtube-dl`、サイト固有の HTML 解析などを含みます。現在の環境での互換性は個別に確認してください。
 
 ## リポジトリ構成
+
+プロジェクト固有の知識は [OKF v0.2 の索引](knowledge/index.md) から参照します。まず索引で関連項目を選び、必要な文書だけを読んでください。Codex の行動規則は [AGENTS.md](AGENTS.md)、知識の更新・検証方法は [運用手順](knowledge/maintaining-knowledge.md) に記載しています。既存ドキュメントと設定の差異は [Python 環境の知識](knowledge/python-environment.md) に記録しています。
 
 ルート直下に各スクリプトを配置しています。`pyproject.toml` と `uv.lock` は Python 環境用です。
 
